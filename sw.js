@@ -1,5 +1,74 @@
-const SW_VERSION = "gym-tracker-sw-v2";
-const CACHE_NAME = "gym-tracker-static-v1";
+try {
+  importScripts("js/firebase-config.js");
+} catch (error) {
+  console.warn("[SW] No se pudo cargar js/firebase-config.js", error);
+}
+
+function isFirebaseConfiguredInSw() {
+  const x = self.__GYM_FIREBASE__;
+  if (!x || !x.firebaseConfig || !x.vapidKey) {
+    return false;
+  }
+  const { apiKey } = x.firebaseConfig;
+  return (
+    apiKey &&
+    apiKey !== "REPLACE_API_KEY" &&
+    x.vapidKey !== "REPLACE_VAPID_KEY"
+  );
+}
+
+if (isFirebaseConfiguredInSw()) {
+  try {
+    importScripts(
+      "https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"
+    );
+    importScripts(
+      "https://www.gstatic.com/firebasejs/10.14.1/firebase-messaging-compat.js"
+    );
+    firebase.initializeApp(self.__GYM_FIREBASE__.firebaseConfig);
+    const messaging = firebase.messaging();
+    messaging.onBackgroundMessage((payload) => {
+      const n = payload.notification || {};
+      const iconUrl = new URL(
+        "assets/icon-192.png",
+        self.registration.scope
+      ).href;
+      return self.registration.showNotification(n.title || "Gym Tracker", {
+        body: n.body || "",
+        icon: iconUrl,
+        data: payload.data || {}
+      });
+    });
+  } catch (error) {
+    console.warn("[SW] Firebase Messaging no inicializado", error);
+  }
+}
+
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  const targetUrl = new URL("index.html", self.registration.scope).href;
+  event.waitUntil(
+    self.clients
+      .matchAll({ type: "window", includeUncontrolled: true })
+      .then((clientList) => {
+        for (const client of clientList) {
+          if (
+            client.url.startsWith(self.registration.scope) &&
+            "focus" in client
+          ) {
+            return client.focus();
+          }
+        }
+        if (self.clients.openWindow) {
+          return self.clients.openWindow(targetUrl);
+        }
+        return undefined;
+      })
+  );
+});
+
+const SW_VERSION = "gym-tracker-sw-v3";
+const CACHE_NAME = "gym-tracker-static-v2";
 
 const PRECACHE_FILES = [
   "index.html",
@@ -8,6 +77,8 @@ const PRECACHE_FILES = [
   "js/app.js",
   "js/seeds.js",
   "js/register-sw.js",
+  "js/firebase-config.js",
+  "js/push.js",
   "manifest.webmanifest",
   "assets/icon-192.png",
   "assets/icon-512.png"
