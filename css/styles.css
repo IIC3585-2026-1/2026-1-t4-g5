@@ -22,6 +22,17 @@ body {
   color: var(--text);
 }
 
+.offline-banner {
+  margin: 0;
+  padding: 12px 16px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 600;
+  color: #7c2d12;
+  background: #ffedd5;
+  border-bottom: 1px solid #fdba74;
+}
+
 .app-container {
   width: min(100% - 32px, 900px);
   margin: 0 auto;
