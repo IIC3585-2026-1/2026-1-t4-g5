@@ -1,29 +1,55 @@
 # T4 Web Avanzado - Gym Tracker PWA
 
-Gym Tracker es una PWA simple para registrar entrenamientos de gimnasio. Permite
-guardar ejercicios por fecha, agregar series con peso y repeticiones, filtrar el
-historial por dia de la semana, cargar datos de prueba y recibir notificaciones
-push mediante Firebase Cloud Messaging.
+Gym Tracker es una PWA simple para registrar entrenamientos de gimnasio. Permite guardar ejercicios por fecha, agregar series con peso y repeticiones, filtrar el
+historial por dia de la semana, cargar datos de prueba y recibir notificaciones push mediante Firebase Cloud Messaging.
 
-La app esta inspirada en Bangle.io en el sentido de ser una herramienta de 
-funcionamiento local para registrar informacion personal y poder seguir
-usandola aunque no haya conexion. En este caso, el registro se adapto a notas estructuradas de entrenamiento y progresion.
+La app esta inspirada en Bangle.io en el sentido de ser una herramienta de funcionamiento local para registrar informacion personal y poder seguir usándola aunque no haya conexion. En este caso, el registro se adaptó a notas estructuradas de entrenamiento y progresión.
 
 ## Relacion con la tarea
 
-El objetivo de la entrega era experimentar con tecnologias asociadas a PWA. Esta
-app cubre los puntos principales del enunciado:
+El objetivo de la entrega era experimentar con tecnologias asociadas a PWA. Esta app cubre los puntos principales del enunciado:
 
-- **Funcionamiento offline limitado:** el service worker precarga la interfaz,
-  estilos, scripts principales, manifest e iconos. Los datos quedan guardados en
-  `localStorage`, por lo que el historial sigue disponible en el mismo
-  dispositivo.
+- **Funcionamiento offline limitado:** el service worker precarga la interfaz, estilos, scripts principales, manifest e iconos. Los datos quedan guardados en `localStorage`, por lo que el historial sigue disponible en el mismo dispositivo.
 - **Notificaciones push:** la app integra Firebase Cloud Messaging. En primer
   plano los mensajes se manejan en `js/push.js`; en segundo plano se manejan en
   `sw.js`.
 - **Instalable en home screen:** `manifest.webmanifest` define nombre, iconos,
   colores, `start_url`, `scope` y `display: "standalone"`. Junto con el service
   worker permite que el navegador la reconozca como instalable.
+
+## Funcionalidades principales
+
+### Registro de entrenamientos
+
+El usuario puede:
+
+- Seleccionar una fecha.
+- Ingresar el nombre de un ejercicio.
+- Registrar peso.
+- Registrar repeticiones.
+- Guardar múltiples ejercicios por día.
+- Agregar múltiples sets al mismo ejercicio.
+
+### Historial de entrenamientos
+
+La aplicación muestra:
+
+- Los últimos entrenamientos registrados.
+- El día correspondiente a cada entrenamiento.
+- Las series asociadas a cada ejercicio.
+- Un filtro por día en el historial.
+
+### Datos de prueba (Seeds)
+
+La página `seed.html` permite:
+
+- Cargar entrenamientos de ejemplo.
+- Generar progresiones semanales automáticamente.
+- Limpiar todos los datos almacenados.
+
+Esto facilita las pruebas visuales y funcionales sin necesidad de ingresar datos manualmente.
+
+---
 
 ## Como levantar el proyecto
 
@@ -137,21 +163,22 @@ Para probar push se necesita un proyecto Firebase configurado:
 
 ## Uso de IA
 
-Se uso IA como apoyo durante distintas etapas del proyecto, siempre con revision
-manual del equipo.
+Se usó IA como apoyo durante distintas etapas del proyecto, siempre con revisión manual del equipo.
 
-Primero se uso para validar la idea, se planteo crear una app ligada al
-gimnasio, registro de entrenamientos y progresion, y se reviso si esa idea podia
-calzar con el enunciado de PWA y sus objetivos. Despues de validar que era una
-direccion viable, dividimos el trabajo en tarjetas de Jira más pequeñas,
-atomicas y paralelizables, para que distintas personas pudieran avanzar en
-manifest, service worker, offline, datos locales, notificaciones y frontend sin
-bloquearse entre si.
+Primero se usó para validar la idea, se planteó crear una app ligada al gimnasio, registro de entrenamientos y progresión, y se revisó si esa idea podía calzar con el enunciado de PWA y sus objetivos. Después de validar que era una dirección viable, dividimos el trabajo en tarjetas de Jira más pequeñas, atómicas y paralelizables, para que distintas personas pudieran avanzar en manifest, service worker, offline, datos locales, notificaciones y frontend sin bloquearse entre sí.
 
-Tambien se uso IA para recibir propuestas de codigo y alternativas de
-implementacion. El apoyo fue especialmente util en elementos menos centrales,
-como estructura de interfaz, textos, estilos y organizacion de archivos. En las
-partes mas importantes para la tarea, como service worker, cache offline,
-manifest y Firebase Cloud Messaging, el codigo propuesto fue revisado y ajustado
-manualmente para entender que hacia cada parte y asegurar que cumpliera con los
-requerimientos de la entrega.
+También se usó IA para recibir propuestas de código y alternativas de implementación. El apoyo fue especialmente útil en elementos menos centrales, como estructura de interfaz, textos, estilos y organización de archivos.
+
+Además, la IA ayudó a:
+
+- Proponer una base de la estructura visual.
+- Mejorar la distribución de componentes.
+- Sugerir estilos responsive.
+- Refactorizar funciones repetitivas.
+- Simplificar manejo de fechas.
+- Generar ideas para datos de prueba y progresión semanal.
+- Ayudar en la documentación técnica del proyecto.
+
+En las partes más importantes para la tarea, como service worker, caché offline, manifest y Firebase Cloud Messaging, el código propuesto fue revisado y ajustado manualmente para entender qué hacía cada parte y asegurar que cumpliera con los requerimientos de la entrega.
+
+La IA fue utilizada únicamente como herramienta de apoyo y no como reemplazo del desarrollo del proyecto.
