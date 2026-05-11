@@ -1,6 +1,7 @@
 const PUSH_TOKEN_KEY = "gym-tracker-fcm-token";
 
 function isFirebaseConfigured() {
+  // La app funciona sin Firebase, pero las push solo se activan con config real.
   const x = window.__GYM_FIREBASE__;
   if (!x || !x.firebaseConfig || !x.vapidKey) {
     return false;
@@ -16,6 +17,7 @@ function isFirebaseConfigured() {
 let messagingReady = false;
 
 async function ensureMessaging() {
+  // Inicializamos Firebase una sola vez y reutilizamos la instancia de messaging.
   if (messagingReady) {
     return firebase.messaging();
   }
@@ -26,6 +28,7 @@ async function ensureMessaging() {
 
   const messaging = firebase.messaging();
   messaging.onMessage((payload) => {
+    // Mensajes recibidos mientras la app esta abierta.
     const title = payload.notification?.title || "Gym Tracker";
     const body = payload.notification?.body || "";
     if (Notification.permission === "granted") {
@@ -72,7 +75,8 @@ window.addEventListener("load", () => {
       return;
     }
   } catch {
-    /* continuar: versiones sin isSupported */
+    // Algunas versiones/navegadores no exponen bien isSupported.
+    // En ese caso seguimos y dejamos que getToken entregue el error real.
   }
 
   if (localStorage.getItem(PUSH_TOKEN_KEY)) {
@@ -81,6 +85,7 @@ window.addEventListener("load", () => {
   }
 
   btn.addEventListener("click", async () => {
+    // El token identifica este navegador para poder enviar una prueba desde Firebase.
     const permission = await Notification.requestPermission();
     if (permission !== "granted") {
       statusEl.textContent =
