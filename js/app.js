@@ -1,5 +1,7 @@
 console.log("App iniciada");
 
+// Claves usadas para guardar los datos en localStorage.
+// La antigua queda para poder leer datos de versiones anteriores.
 const STORAGE_KEY = "gym-tracker-workouts";
 const LEGACY_STORAGE_KEY = "gym-tracker-training-days";
 const MAX_VISIBLE_WORKOUTS = 10;
@@ -16,6 +18,7 @@ const DAY_NAMES = [
 let workouts = loadWorkouts();
 saveWorkouts();
 
+// Referencias a los elementos principales de la pantalla.
 const workoutForm = document.querySelector("#workout-form");
 const dateInput = document.querySelector("#date-input");
 const exerciseInput = document.querySelector("#exercise-input");
@@ -27,6 +30,7 @@ const workoutList = document.querySelector("#workout-list");
 dateInput.value = getTodayDate();
 
 function loadWorkouts() {
+  // Primero intentamos leer el formato actual de la app.
   const savedWorkouts = localStorage.getItem(STORAGE_KEY);
 
   if (savedWorkouts !== null) {
@@ -36,6 +40,7 @@ function loadWorkouts() {
   const legacyTrainingDays = localStorage.getItem(LEGACY_STORAGE_KEY);
 
   if (legacyTrainingDays !== null) {
+    // Si existen datos antiguos, los convertimos al modelo nuevo.
     return migrateTrainingDays(JSON.parse(legacyTrainingDays));
   }
 
@@ -65,6 +70,8 @@ function saveWorkouts() {
 }
 
 function parseLocalDate(dateValue) {
+  // Evitamos new Date("YYYY-MM-DD") porque puede interpretar UTC
+  // y mover el dia segun la zona horaria.
   const [year, month, day] = dateValue.split("-").map(Number);
   return new Date(year, month - 1, day);
 }
@@ -143,6 +150,7 @@ function getVisibleWorkouts() {
   const selectedDay = dayFilter.value;
   const sortedWorkouts = [...workouts].sort((a, b) => b.date.localeCompare(a.date));
 
+  // Solo mostramos los ultimos entrenamientos para que el historial no crezca infinito.
   if (selectedDay === "all") {
     return sortedWorkouts.slice(0, MAX_VISIBLE_WORKOUTS);
   }
@@ -156,6 +164,7 @@ function renderWorkouts() {
   const visibleWorkouts = getVisibleWorkouts();
   workoutList.innerHTML = "";
 
+  // Estado vacio para cuando todavia no hay datos o el filtro no encuentra resultados.
   if (visibleWorkouts.length === 0) {
     const emptyMessage = document.createElement("p");
     emptyMessage.className = "empty-message";
@@ -215,12 +224,15 @@ function renderWorkouts() {
 function addExerciseToWorkout(dateValue, exerciseName, set) {
   let workout = findWorkout(dateValue);
 
+  // Cada fecha tiene un entrenamiento. Si no existe, se crea en el momento.
   if (workout === undefined) {
     workout = createWorkout(dateValue);
   }
 
   const existingExercise = findExercise(workout, exerciseName);
 
+  // Si el ejercicio ya estaba ese dia, agregamos una serie nueva.
+  // Si no habia peso/reps, solo queda registrado el nombre del ejercicio.
   if (existingExercise !== undefined) {
     if (set !== null) {
       existingExercise.sets.push(set);
@@ -239,6 +251,7 @@ function addExerciseToWorkout(dateValue, exerciseName, set) {
 workoutForm.addEventListener("submit", (event) => {
   event.preventDefault();
 
+  // El formulario acepta ejercicios sin serie, pero no sin fecha ni nombre.
   const dateValue = dateInput.value;
   const exerciseName = exerciseInput.value.trim();
   const set = createSet(weightInput.value, repsInput.value);

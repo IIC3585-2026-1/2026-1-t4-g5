@@ -5,6 +5,7 @@ try {
 }
 
 function isFirebaseConfiguredInSw() {
+  // Misma validacion que en la pagina, pero dentro del service worker.
   const x = self.__GYM_FIREBASE__;
   if (!x || !x.firebaseConfig || !x.vapidKey) {
     return false;
@@ -19,6 +20,7 @@ function isFirebaseConfiguredInSw() {
 
 if (isFirebaseConfiguredInSw()) {
   try {
+    // Firebase compat se usa porque esta app no tiene build step ni modules.
     importScripts(
       "https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"
     );
@@ -28,6 +30,7 @@ if (isFirebaseConfiguredInSw()) {
     firebase.initializeApp(self.__GYM_FIREBASE__.firebaseConfig);
     const messaging = firebase.messaging();
     messaging.onBackgroundMessage((payload) => {
+      // Mensajes recibidos cuando la app esta cerrada o en segundo plano.
       const n = payload.notification || {};
       const iconUrl = new URL(
         "assets/icon-192.png",
@@ -48,6 +51,7 @@ self.addEventListener("notificationclick", (event) => {
   event.notification.close();
   const targetUrl = new URL("index.html", self.registration.scope).href;
   event.waitUntil(
+    // Si ya hay una ventana de la app abierta, la enfocamos. Si no, abrimos una nueva.
     self.clients
       .matchAll({ type: "window", includeUncontrolled: true })
       .then((clientList) => {
@@ -70,6 +74,7 @@ self.addEventListener("notificationclick", (event) => {
 const SW_VERSION = "gym-tracker-sw-v3";
 const CACHE_NAME = "gym-tracker-static-v2";
 
+// Archivos minimos para que la app cargue offline despues de instalar el SW.
 const PRECACHE_FILES = [
   "index.html",
   "seed.html",
@@ -92,6 +97,7 @@ function precacheHrefs() {
 self.addEventListener("install", (event) => {
   console.log("[SW]", SW_VERSION, "install");
   event.waitUntil(
+    // Precarga el app shell y activa esta version apenas termina.
     caches
       .open(CACHE_NAME)
       .then((cache) => cache.addAll(precacheHrefs()))
@@ -102,6 +108,7 @@ self.addEventListener("install", (event) => {
 self.addEventListener("activate", (event) => {
   console.log("[SW]", SW_VERSION, "activate");
   event.waitUntil(
+    // Limpia caches viejos para evitar servir archivos de versiones anteriores.
     Promise.all([
       caches.keys().then((keys) =>
         Promise.all(
@@ -120,6 +127,7 @@ function scopeHref(path) {
 }
 
 async function cacheDocumentFallback(request) {
+  // Para navegacion offline devolvemos la pantalla que corresponda.
   const cache = await caches.open(CACHE_NAME);
   const path = new URL(request.url).pathname.replace(/\/$/, "") || "/";
 
@@ -141,6 +149,7 @@ self.addEventListener("fetch", (event) => {
       const isNavigate = event.request.mode === "navigate";
 
       if (isNavigate) {
+        // Navegaciones, intentamos red primero para ver contenido actualizado.
         try {
           return await fetch(event.request);
         } catch {
@@ -163,6 +172,7 @@ self.addEventListener("fetch", (event) => {
         return cached;
       }
 
+      // Assets no precargados, red primero, y si falla devolvemos 503.
       try {
         return await fetch(event.request);
       } catch {

@@ -21,6 +21,7 @@ function initOfflineBanner() {
 window.addEventListener("load", () => {
   initOfflineBanner();
 
+  // El service worker habilita cache offline y notificaciones en background.
   if (!("serviceWorker" in navigator)) {
     console.info("Service Worker no disponible en este navegador.");
     return;

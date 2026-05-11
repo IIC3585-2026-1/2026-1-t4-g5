@@ -23,6 +23,7 @@
       <a class="seed-link" href="seed.html">Datos de prueba</a>
     </header>
 
+    <!-- Formulario principal: cada envio agrega un ejercicio al dia seleccionado. -->
     <form class="workout-form" id="workout-form">
       <label class="visually-hidden" for="date-input">Fecha de entrenamiento</label>
       <input
@@ -57,6 +58,7 @@
       <button type="submit">Agregar ejercicio</button>
     </form>
 
+    <!-- Seccion opcional para activar FCM y probar notificaciones push. -->
     <section class="seed-card push-card" aria-labelledby="push-heading">
       <p class="section-kicker">Notificaciones</p>
       <h2 id="push-heading" class="push-card-title">Recordatorios push</h2>
@@ -71,6 +73,7 @@
       <p id="push-status" class="seed-status" role="status"></p>
     </section>
 
+    <!-- Filtro y contenedor donde app.js pinta el historial guardado. -->
     <section class="history-toolbar">
       <div>
         <p class="section-kicker">Historial</p>

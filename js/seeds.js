@@ -15,6 +15,7 @@ const clearButton = document.querySelector("#clear-button");
 const seedStatus = document.querySelector("#seed-status");
 
 function parseLocalDate(dateValue) {
+  // Parseo local para que el dia de la semana no cambie por zona horaria.
   const [year, month, day] = dateValue.split("-").map(Number);
   return new Date(year, month - 1, day);
 }
@@ -32,6 +33,8 @@ function getDayName(dateValue) {
 }
 
 function getRecentDatesForDay(dayName, amount) {
+  // Busca las ultimas fechas reales para un dia de la semana.
+  // Asi los datos de prueba siempre quedan cerca de la fecha actual.
   const targetDayIndex = DAY_NAMES.indexOf(dayName);
   const today = new Date();
   const dates = [];
@@ -62,12 +65,14 @@ function createWorkout(date, exercises) {
 }
 
 function createProgressionWorkouts(dayName, amount, buildExercises) {
+  // reverse deja los datos en orden cronologico para que la progresion suba.
   return getRecentDatesForDay(dayName, amount)
     .reverse()
     .map((date, index) => createWorkout(date, buildExercises(index)));
 }
 
 function createSeedWorkouts() {
+  // Rutina de ejemplo tipo fuerza, lunes, miercoles y viernes.
   const mondayWorkouts = createProgressionWorkouts("Lunes", 12, (index) => [
     {
       name: "Squat",
@@ -132,6 +137,7 @@ function createSeedWorkouts() {
 }
 
 function seedData() {
+  // Reemplaza los datos actuales por seeds para partir desde un estado conocido.
   const workouts = createSeedWorkouts();
   localStorage.setItem(STORAGE_KEY, JSON.stringify(workouts));
   localStorage.removeItem(LEGACY_STORAGE_KEY);
@@ -139,6 +145,7 @@ function seedData() {
 }
 
 function clearData() {
+  // Limpia tanto el formato nuevo como el antiguo.
   localStorage.removeItem(STORAGE_KEY);
   localStorage.removeItem(LEGACY_STORAGE_KEY);
   seedStatus.textContent = "Datos locales eliminados.";
